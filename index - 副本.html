@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>考试系统 - 登录</title>
+    <style>
+        :root {
+            --bg-start: #e8eaf6;
+            --bg-end: #c5cae9;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-light: #5a6c7d;
+            --primary: #5c6bc0;
+            --primary-hover: #3f51b5;
+            --input-border: #dde1e7;
+            --input-focus: #7986cb;
+            --shadow-card: 0 20px 60px rgba(60, 70, 120, 0.12), 0 8px 20px rgba(60, 70, 120, 0.08);
+            --shadow-btn: 0 8px 24px rgba(92, 107, 192, 0.35);
+            --radius: 16px;
+            --radius-sm: 10px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', -apple-system, BlinkMacSystemFont, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, #e8eaf6 0%, #d1d9f0 25%, #e3e8f8 50%, #cdd5ed 75%, #dfe4f3 100%);
+            background-size: 400% 400%;
+            animation: bgShift 18s ease-in-out infinite;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.35;
+            pointer-events: none;
+            z-index: 0;
+            animation: orbFloat 12s ease-in-out infinite;
+        }
+        .bg-orb.orb-1 {
+            width: 320px;
+            height: 320px;
+            background: #c5cae9;
+            top: -8%;
+            left: -6%;
+            animation-duration: 14s;
+        }
+        .bg-orb.orb-2 {
+            width: 280px;
+            height: 280px;
+            background: #d1c4e9;
+            bottom: -10%;
+            right: -5%;
+            animation-delay: -5s;
+            animation-duration: 16s;
+        }
+        .bg-orb.orb-3 {
+            width: 200px;
+            height: 200px;
+            background: #bbdefb;
+            top: 50%;
+            left: 55%;
+            animation-delay: -9s;
+            animation-duration: 13s;
+        }
+
+        @keyframes bgShift {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+        @keyframes orbFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            20% { transform: translate(60px, -45px) scale(1.1); }
+            40% { transform: translate(-30px, -70px) scale(0.9); }
+            60% { transform: translate(-55px, 30px) scale(1.15); }
+            80% { transform: translate(40px, 55px) scale(0.85); }
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 460px;
+            padding: 20px;
+        }
+
+        /* 登录卡片 —— 去掉了 overflow: hidden，避免裁切错误提示 */
+        .login-card {
+            background: var(--card-bg);
+            border-radius: 22px;
+            padding: 44px 36px 38px;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            position: relative;
+            transition: all var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+        }
+        .login-card::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 130px;
+            height: 130px;
+            background: linear-gradient(135deg, #7986cb 0%, #5c6bc0 50%, #9fa8da 100%);
+            border-radius: 50%;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+        .login-card .icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 100%);
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(92, 107, 192, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .login-card .icon-wrapper svg {
+            width: 30px;
+            height: 30px;
+            fill: #fff;
+        }
+        .login-card h1 {
+            font-size: 26px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 6px;
+            letter-spacing: 0.5px;
+            position: relative;
+            z-index: 1;
+        }
+        .login-card .subtitle {
+            font-size: 14px;
+            color: #8899aa;
+            margin-bottom: 32px;
+            letter-spacing: 1px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .input-group {
+            position: relative;
+            z-index: 1;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #4a5568;
+            margin-bottom: 7px;
+            letter-spacing: 0.4px;
+            transition: color var(--transition);
+        }
+        .input-group .input-field {
+            display: flex;
+            align-items: center;
+            background: #f7f8fc;
+            border: 2px solid var(--input-border);
+            border-radius: var(--radius-sm);
+            padding: 0 16px;
+            transition: all var(--transition);
+            position: relative;
+        }
+        .input-group .input-field:focus-within {
+            border-color: var(--input-focus);
+            background: #fff;
+            box-shadow: 0 0 0 6px rgba(121, 134, 203, 0.07);
+        }
+        .input-group .input-field svg {
+            width: 18px;
+            height: 18px;
+            fill: #aab5c0;
+            flex-shrink: 0;
+            transition: fill var(--transition);
+        }
+        .input-group .input-field:focus-within svg {
+            fill: #5c6bc0;
+        }
+        .input-group input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 15px 10px;
+            font-size: 16px;
+            color: #2c3e50;
+            outline: none;
+            font-family: inherit;
+            letter-spacing: 0.3px;
+            width: 100%;
+            min-width: 0;
+        }
+        .input-group input::placeholder {
+            color: #c0c8d4;
+            font-size: 14px;
+        }
+        .input-group .underline-hint {
+            position: absolute;
+            bottom: -1px;
+            left: 50%;
+            transform: translateX(-50%) scaleX(0);
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #5c6bc0, transparent);
+            border-radius: 2px;
+            transition: transform 0.4s ease;
+            pointer-events: none;
+        }
+        .input-group .input-field:focus-within .underline-hint {
+            transform: translateX(-50%) scaleX(1);
+        }
+
+        .btn-login {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            padding: 15px;
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, #5c6bc0 0%, #7986cb 50%, #5c6bc0 100%);
+            background-size: 200% 200%;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            letter-spacing: 1.5px;
+            transition: all var(--transition);
+            box-shadow: var(--shadow-btn);
+            margin-top: 8px;
+            overflow: hidden;
+        }
+        .btn-login:hover {
+            background-position: 100% 100%;
+            box-shadow: 0 12px 30px rgba(92, 107, 192, 0.45);
+            transform: translateY(-2px);
+        }
+        .btn-login:active {
+            transform: translateY(0) scale(0.97);
+            box-shadow: 0 4px 12px rgba(92, 107, 192, 0.3);
+        }
+        .btn-login .btn-ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.35);
+            transform: scale(0);
+            animation: ripple 0.7s ease-out forwards;
+            pointer-events: none;
+        }
+        @keyframes ripple {
+            to { transform: scale(4); opacity: 0; }
+        }
+
+        /* 错误提示——保证始终可见 */
+        .error-msg {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 12px;
+            min-height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            opacity: 0;
+            transform: translateY(-5px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        .error-msg.show {
+            opacity: 1;
+            transform: translateY(0);
+            animation: shake 0.5s ease;
+        }
+        .error-msg svg {
+            width: 15px;
+            height: 15px;
+            fill: #e74c3c;
+            flex-shrink: 0;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            15% { transform: translateX(-6px); }
+            30% { transform: translateX(6px); }
+            45% { transform: translateX(-5px); }
+            60% { transform: translateX(4px); }
+            75% { transform: translateX(-2px); }
+            90% { transform: translateX(1px); }
+        }
+
+        .hint-card {
+            position: relative;
+            z-index: 1;
+            margin-top: 16px;
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(8px);
+            border-radius: 12px;
+            padding: 14px 18px;
+            font-size: 12px;
+            color: #7b8ca0;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            letter-spacing: 0.3px;
+        }
+        .hint-card span {
+            color: #5c6bc0;
+            font-weight: 600;
+        }
+
+        /* 结果页面 */
+        .result-page {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 10;
+            background: linear-gradient(160deg, #fdf2f5 0%, #fef7f4 20%, #fdf4f7 40%, #fef9f6 60%, #fdf3f6 80%, #fef8f5 100%);
+            background-size: 300% 300%;
+            animation: bgShiftWarm 20s ease-in-out infinite;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .result-page.active {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 40px 20px 60px;
+        }
+        @keyframes bgShiftWarm {
+            0%, 100% { background-position: 0% 50%; }
+            25% { background-position: 100% 0%; }
+            50% { background-position: 100% 100%; }
+            75% { background-position: 0% 100%; }
+        }
+
+        .petal {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            opacity: 0;
+            animation: petalFall linear infinite;
+        }
+        .petal::before {
+            content: '🌸';
+            font-size: 20px;
+            display: block;
+        }
+        @keyframes petalFall {
+            0% { transform: translateY(-10vh) rotate(0deg) translateX(0); opacity: 0; }
+            5% { opacity: 0.7; }
+            85% { opacity: 0.5; }
+            100% { transform: translateY(105vh) rotate(720deg) translateX(120px); opacity: 0; }
+        }
+
+        .result-container {
+            position: relative;
+            z-index: 2;
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+            animation: fadeInUp 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .student-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1.5px solid rgba(240, 150, 160, 0.4);
+            border-radius: 50px;
+            padding: 10px 22px;
+            margin-bottom: 28px;
+            font-size: 15px;
+            color: #8b5e6b;
+            letter-spacing: 0.8px;
+            font-weight: 500;
+            box-shadow: 0 4px 16px rgba(200, 140, 150, 0.15);
+        }
+        .student-badge .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #e8987a;
+            animation: pulseDot 1.8s ease-in-out infinite;
+        }
+        @keyframes pulseDot {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(232, 152, 122, 0.5); }
+            50% { box-shadow: 0 0 0 12px rgba(232, 152, 122, 0); }
+        }
+
+        .poem-title {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #e8788a 0%, #d4687b 20%, #f0a090 45%, #e88898 65%, #d47080 100%);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            animation: gradientShift 5s ease-in-out infinite;
+            line-height: 1.2;
+        }
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .poem-author {
+            font-size: 18px;
+            color: #b08090;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+        .poem-divider {
+            width: 80px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #e8b4b8, transparent);
+            margin: 0 auto 32px;
+            border-radius: 2px;
+        }
+
+        .poem-content {
+            font-size: 24px;
+            line-height: 2.1;
+            letter-spacing: 1.5px;
+            text-align: center;
+            background: linear-gradient(180deg,
+                    #c44b5e 0%, #d4687b 12%, #e08090 25%,
+                    #e8988a 40%, #e88898 55%, #d47080 70%,
+                    #c4586a 85%, #b84558 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
+            font-weight: 500;
+            padding: 20px 10px;
+            font-family: 'PingFang SC', 'Noto Serif SC', 'STSong', 'Songti SC', 'KaiTi', '楷体', 'Microsoft YaHei', serif;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+        .poem-content .paragraph {
+            margin-bottom: 18px;
+        }
+
+        .btn-back {
+            position: relative;
+            z-index: 2;
+            margin-top: 36px;
+            padding: 13px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #c4586a;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(8px);
+            border: 1.5px solid rgba(220, 150, 160, 0.5);
+            border-radius: 50px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(200, 140, 150, 0.12);
+        }
+        .btn-back:hover {
+            background: rgba(255, 255, 255, 0.85);
+            border-color: #d48090;
+            box-shadow: 0 8px 24px rgba(200, 140, 150, 0.25);
+            transform: translateY(-2px);
+            color: #b04055;
+        }
+        .btn-back:active {
+            transform: scale(0.95);
+        }
+
+        @media (max-width: 600px) {
+            .login-card { padding: 32px 22px 28px; border-radius: 18px; }
+            .login-card h1 { font-size: 22px; }
+            .login-card .icon-wrapper { width: 50px; height: 50px; }
+            .btn-login { font-size: 15px; padding: 13px; }
+            .input-group input { font-size: 15px; padding: 13px 8px; }
+            .poem-title { font-size: 30px; letter-spacing: 2px; }
+            .poem-content { font-size: 19px; line-height: 1.9; letter-spacing: 1px; }
+            .poem-author { font-size: 15px; }
+            .student-badge { font-size: 13px; padding: 8px 16px; }
+            .result-page.active { padding: 28px 14px 50px; }
+            .btn-back { font-size: 13px; padding: 11px 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+
+    <!-- 登录页面 -->
+    <div class="main-container" id="loginPage">
+        <div class="login-card">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z"/>
+                </svg>
+            </div>
+            <h1>考试系统登录</h1>
+            <p class="subtitle">EXAMINATION SYSTEM</p>
+
+            <div class="input-group">
+                <label for="studentName">👤 考生姓名</label>
+                <div class="input-field">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <input type="text" id="studentName" placeholder="请输入考生姓名" autocomplete="off" autofocus>
+                    <div class="underline-hint"></div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label for="examNumber">🔢 考号</label>
+                <div class="input-field">
+                    <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/><rect x="2" y="2" width="20" height="20" rx="2" fill="none" stroke="currentColor" stroke-width="2"/></svg>
+                    <input type="text" id="examNumber" placeholder="请输入考号" autocomplete="off" inputmode="numeric">
+                    <div class="underline-hint"></div>
+                </div>
+            </div>
+
+            <button class="btn-login" id="btnLogin" onclick="handleLogin()">
+                🚪 进入考试
+            </button>
+
+            <div class="error-msg" id="errorMsg">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                <span id="errorText"></span>
+            </div>
+        </div>
+
+        <div class="hint-card">
+            💡 提示：请输入正确的 <span>姓名</span> 与 <span>考号</span> 以进入考试页面
+        </div>
+    </div>
+
+    <!-- 结果页面 -->
+    <div class="result-page" id="resultPage">
+        <div id="petalsContainer"></div>
+
+        <div class="result-container">
+            <div class="student-badge">
+                <span class="badge-dot"></span>
+                考生：<strong id="displayStudentName">王悦桦</strong>
+                &nbsp;|&nbsp; 考号：<strong id="displayExamNumber">123456</strong>
+            </div>
+
+            <h1 class="poem-title">桃 花 源 记</h1>
+            <p class="poem-author">【东晋】陶渊明</p>
+            <div class="poem-divider"></div>
+
+            <div class="poem-content">
+                <p class="paragraph">
+                    晋太元中，武陵人捕鱼为业。缘溪行，忘路之远近。忽逢桃花林，夹岸数百步，中无杂树，芳草鲜美，落英缤纷。渔人甚异之，复前行，欲穷其林。
+                </p>
+                <p class="paragraph">
+                    林尽水源，便得一山，山有小口，仿佛若有光。便舍船，从口入。初极狭，才通人。复行数十步，豁然开朗。土地平旷，屋舍俨然，有良田、美池、桑竹之属。阡陌交通，鸡犬相闻。其中往来种作，男女衣着，悉如外人。黄发垂髫，并怡然自乐。
+                </p>
+                <p class="paragraph">
+                    见渔人，乃大惊，问所从来。具答之。便要还家，设酒杀鸡作食。村中闻有此人，咸来问讯。自云先世避秦时乱，率妻子邑人来此绝境，不复出焉，遂与外人间隔。问今是何世，乃不知有汉，无论魏晋。此人一一为具言所闻，皆叹惋。余人各复延至其家，皆出酒食。停数日，辞去。此中人语云："不足为外人道也。"
+                </p>
+                <p class="paragraph">
+                    既出，得其船，便扶向路，处处志之。及郡下，诣太守，说如此。太守即遣人随其往，寻向所志，遂迷，不复得路。
+                </p>
+                <p class="paragraph">
+                    南阳刘子骥，高尚士也，闻之，欣然规往。未果，寻病终。后遂无问津者。
+                </p>
+            </div>
+
+            <button class="btn-back" onclick="goBack()">
+                ← 返回登录页面
+            </button>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // 预设学生数据
+            const studentData = {
+                name: '王悦桦',
+                examNumber: '123456',
+                contentTitle: '桃花源记',
+                contentAuthor: '【东晋】陶渊明'
+            };
+
+            // 登录处理
+            window.handleLogin = function() {
+                const nameInput = document.getElementById('studentName');
+                const examInput = document.getElementById('examNumber');
+                const nameVal = nameInput.value.trim();
+                const examVal = examInput.value.trim();
+                const errorMsg = document.getElementById('errorMsg');
+                const errorText = document.getElementById('errorText');
+
+                // 辅助函数
+                function showError(msg) {
+                    errorText.textContent = msg;
+                    errorMsg.classList.add('show');
+                }
+                function hideError() {
+                    errorMsg.classList.remove('show');
+                }
+                function shakeField(field) {
+                    if (!field) return;
+                    field.style.animation = 'none';
+                    field.offsetHeight;
+                    field.style.animation = 'shake 0.45s ease';
+                    setTimeout(() => { field.style.animation = ''; }, 500);
+                }
+
+                // 验证逻辑
+                if (!nameVal && !examVal) {
+                    showError('请填写考生姓名和考号');
+                    shakeField(nameInput.closest('.input-field'));
+                    shakeField(examInput.closest('.input-field'));
+                    return;
+                }
+                if (!nameVal) {
+                    showError('请填写考生姓名');
+                    shakeField(nameInput.closest('.input-field'));
+                    nameInput.focus();
+                    return;
+                }
+                if (!examVal) {
+                    showError('请填写考号');
+                    shakeField(examInput.closest('.input-field'));
+                    examInput.focus();
+                    return;
+                }
+
+                if (nameVal === studentData.name && examVal === studentData.examNumber) {
+                    hideError();
+                    document.getElementById('displayStudentName').textContent = studentData.name;
+                    document.getElementById('displayExamNumber').textContent = studentData.examNumber;
+                    switchToResultPage();
+                } else if (nameVal === studentData.name && examVal !== studentData.examNumber) {
+                    showError('考号不正确，请核对后重新输入');
+                    shakeField(examInput.closest('.input-field'));
+                    examInput.focus();
+                    examInput.select();
+                } else if (nameVal !== studentData.name && examVal === studentData.examNumber) {
+                    showError('考生姓名不正确，请核对后重新输入');
+                    shakeField(nameInput.closest('.input-field'));
+                    nameInput.focus();
+                    nameInput.select();
+                } else {
+                    showError('姓名与考号均不匹配，请核实信息');
+                    shakeField(nameInput.closest('.input-field'));
+                    shakeField(examInput.closest('.input-field'));
+                    nameInput.focus();
+                    nameInput.select();
+                }
+            };
+
+            // 页面切换
+            function switchToResultPage() {
+                const loginPage = document.getElementById('loginPage');
+                const resultPage = document.getElementById('resultPage');
+
+                loginPage.style.opacity = '0';
+                loginPage.style.transform = 'scale(0.95)';
+                loginPage.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                loginPage.style.pointerEvents = 'none';
+
+                setTimeout(() => {
+                    loginPage.style.display = 'none';
+                    resultPage.classList.add('active');
+                    resultPage.style.opacity = '0';
+                    requestAnimationFrame(() => {
+                        resultPage.style.opacity = '1';
+                        resultPage.style.transition = 'opacity 0.5s ease';
+                    });
+                    createPetals();
+                    resultPage.scrollTop = 0;
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 400);
+            }
+
+            window.goBack = function() {
+                const loginPage = document.getElementById('loginPage');
+                const resultPage = document.getElementById('resultPage');
+
+                clearPetals();
+                resultPage.style.opacity = '0';
+                resultPage.style.transition = 'opacity 0.4s ease';
+
+                setTimeout(() => {
+                    resultPage.classList.remove('active');
+                    resultPage.style.opacity = '';
+                    loginPage.style.display = 'block';
+                    loginPage.style.opacity = '0';
+                    loginPage.style.transform = 'scale(0.95)';
+                    loginPage.style.pointerEvents = 'auto';
+                    requestAnimationFrame(() => {
+                        loginPage.style.opacity = '1';
+                        loginPage.style.transform = 'scale(1)';
+                    });
+                    document.getElementById('studentName').value = '';
+                    document.getElementById('examNumber').value = '';
+                    document.getElementById('errorMsg').classList.remove('show');
+                    document.getElementById('studentName').focus();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 350);
+            };
+
+            // 花瓣动画
+            let petalTimers = [];
+            function createPetals() {
+                clearPetals();
+                const container = document.getElementById('petalsContainer');
+                const emojis = ['🌸', '💮', '🌷', '🏵️', '🌺'];
+                for (let i = 0; i < 18; i++) {
+                    const petal = document.createElement('div');
+                    petal.className = 'petal';
+                    petal.style.left = Math.random() * 94 + '%';
+                    petal.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                    petal.style.animationDelay = Math.random() * 8 + 's';
+                    petal.style.fontSize = (Math.random() * 18 + 14) + 'px';
+                    const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+                    petal.setAttribute('data-emoji', emoji);
+                    const style = document.createElement('style');
+                    style.textContent = `.petal[data-emoji="${emoji}"]::before { content: '${emoji}'; font-size: inherit; }`;
+                    petal.appendChild(style);
+                    container.appendChild(petal);
+                    petalTimers.push(petal);
+                }
+            }
+            function clearPetals() {
+                petalTimers.forEach(p => p.remove());
+                petalTimers = [];
+            }
+
+            // 所有DOM相关操作移到页面加载完成后
+            window.addEventListener('DOMContentLoaded', function() {
+                // 聚焦姓名输入框
+                const nameInput = document.getElementById('studentName');
+                if (nameInput) nameInput.focus();
+
+                // 回车键登录
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && document.getElementById('loginPage').style.display !== 'none') {
+                        e.preventDefault();
+                        window.handleLogin();
+                    }
+                });
+
+                // 输入时自动隐藏错误
+                const studentNameInput = document.getElementById('studentName');
+                const examNumberInput = document.getElementById('examNumber');
+                const errorMsg = document.getElementById('errorMsg');
+                if (studentNameInput) {
+                    studentNameInput.addEventListener('input', function() {
+                        if (errorMsg.classList.contains('show')) errorMsg.classList.remove('show');
+                    });
+                }
+                if (examNumberInput) {
+                    examNumberInput.addEventListener('input', function() {
+                        if (errorMsg.classList.contains('show')) errorMsg.classList.remove('show');
+                    });
+                }
+
+                // 按钮波纹效果（保证元素存在后绑定）
+                const btnLogin = document.getElementById('btnLogin');
+                if (btnLogin) {
+                    btnLogin.addEventListener('click', function(e) {
+                        const ripple = document.createElement('span');
+                        ripple.className = 'btn-ripple';
+                        const rect = btnLogin.getBoundingClientRect();
+                        const size = Math.max(rect.width, rect.height);
+                        ripple.style.width = ripple.style.height = size + 'px';
+                        ripple.style.left = (e.clientX - rect.left - size / 2) + 'px';
+                        ripple.style.top = (e.clientY - rect.top - size / 2) + 'px';
+                        btnLogin.appendChild(ripple);
+                        ripple.addEventListener('animationend', () => ripple.remove());
+                    });
+                }
+            });
+
+            console.log('📚 考试系统已就绪');
+            console.log('👤 预设考生：' + studentData.name + ' | 考号：' + studentData.examNumber);
+            console.log('📖 对应课文：《' + studentData.contentTitle + '》');
+        })();
+    </script>
+</body>
+</html>
